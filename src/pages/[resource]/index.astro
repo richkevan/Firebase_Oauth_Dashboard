@@ -1,0 +1,79 @@
+---
+export const prerender = false
+const session = Astro.cookies.get('session')
+if (!session) {
+  Astro.redirect('/login')
+}
+const {resource} = Astro.params
+import Layout from '../../components/layout/layout.astro'
+import UserRow from '../../components/mappables/user-row.astro'
+import ClientRow from '../../components/mappables/client-row.astro'
+import { auth, db } from "../../firebase/server"
+let users, clients
+switch (resource) {
+  case 'users':
+    users = await auth.listUsers(1000).then((listUsersResult) => {
+      return listUsersResult.users
+    })
+    console.log(users)
+    break;
+  case 'clients':
+    clients = await db.collection('oauth2_clients').get().then((querySnapshot) => {
+      return querySnapshot.docs.map((doc) => {
+        return {...doc.data(), id: doc.id}
+      })
+    })
+      console.log(clients)
+    break;
+  default:
+    break;
+}
+---
+
+<html lang="en" class="h-full bg-gray-900">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body class="h-full">
+		<Layout>
+			<div class="bg-gray-900 py-10">
+        <h2 class="px-4 text-base font-semibold leading-7 text-white sm:px-6 lg:px-8">Latest {resource} activity</h2>
+        <table class="mt-6 w-full whitespace-nowrap text-left">
+          
+          <div class="border-b border-white/10 text-sm text-white grid grid-cols-4">
+            {users && (
+              <div class="py-2 font-semibold flex-auto">User</div>
+              <div class="py-2 font-semibold flex-auto">Name</div>
+              <div class="py-2 font-semibold flex-auto">Status</div>
+              <div class="py-2 font-semibold flex-auto">Last Login</div>
+              )}
+          </div>
+          <div class="border-b border-white/10 text-sm text-white grid grid-cols-4">
+            {clients && (
+              <div class="py-2 font-semibold flex-auto">Client</div>
+              <div class="py-2 font-semibold flex-auto">Name</div>
+              <div class="py-2 font-semibold flex-auto">Secret</div>
+              <div class="py-2 font-semibold flex-auto">Redirect Uri</div>
+              )}
+          </div>
+          <div class="divide-y divide-white/5 flex flex-col">
+            {
+              users && users.map((user) => (
+              <UserRow {...user} />
+              ))
+            }
+            {
+              clients && clients.map((client) => (
+              <ClientRow {...client} />
+              ))
+            }
+          </div>
+        </table>
+      </div>      
+		</Layout>
+	</body>
+</html>

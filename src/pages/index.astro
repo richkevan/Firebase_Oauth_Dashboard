@@ -1,0 +1,66 @@
+---
+export const prerender = false
+import Layout from '../components/layout/layout.astro'
+import { auth, db } from '../firebase/server'
+const cook = Astro.cookies.get('__session')
+console.log("Index Cookie: ", cook)
+const userCount = auth.listUsers().then((result) => {
+	return result.users.length
+})
+const clientsSnapshot = await db.collection('oauth2_clients').count().get()
+const clientCount = clientsSnapshot.data().count
+---
+
+<html lang="en" class="h-full bg-gray-900">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body class="h-full">
+		<Layout>
+			<div class="md:flex md:items-center md:justify-between">
+				<div class="min-w-0 flex-1">
+					<h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight">Activity</h2>
+				</div>
+			</div>
+			
+				<div class="mx-auto max-w-7xl">
+					<div class="grid grid-cols-1 gap-px bg-white/5 sm:grid-cols-2 lg:grid-cols-4">
+						<div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
+							<p class="text-sm font-medium leading-6 text-gray-400">Total Users</p>
+							<p class="mt-2 flex items-baseline gap-x-2">
+								<span class="text-4xl font-semibold tracking-tight text-white">{userCount}</span>
+							</p>
+						</div>
+						<div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
+							<p class="text-sm font-medium leading-6 text-gray-400">Total Clients</p>
+							<p class="mt-2 flex items-baseline gap-x-2">
+								<span class="text-4xl font-semibold tracking-tight text-white">{clientCount}</span>
+								<!-- <span class="text-sm text-gray-400">mins</span> -->
+							</p>
+						</div>
+						<div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
+							<p class="text-sm font-medium leading-6 text-gray-400">APIs</p>
+							<p class="mt-2 flex items-baseline gap-x-2">
+								<span class="text-4xl font-semibold tracking-tight text-white">3</span>
+							</p>
+						</div>
+						<div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
+							<p class="text-sm font-medium leading-6 text-gray-400">Connections</p>
+							<p class="mt-2 flex items-baseline gap-x-2">
+								<span class="text-4xl font-semibold tracking-tight text-white">98.5%</span>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="mx-auto max-w-7xl text-white">
+					<div class="min-w-0 flex-1">
+						<h2 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight">Active Users</h2>
+					</div>
+				</div>
+		</Layout>
+	</body>
+</html>

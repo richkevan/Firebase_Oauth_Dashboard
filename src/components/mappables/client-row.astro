@@ -1,0 +1,28 @@
+---
+const {id, user_id:clientId, provider_name:clientName, client_secret:clientStatus, redirect_uri } = Astro.props;
+const last4 = clientStatus.slice(-5);
+const redactedSecret = '*'.repeat(clientStatus.length - 5) + last4;
+---
+
+<a href=`/clients/${id}`>
+<div class="hover:bg-white/20 hover:cursor-pointer grid grid-cols-4">
+  
+  <div  class="py-2  flex-auto">
+    <div class="flex items-center gap-x-4">
+      <img src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" class="h-8 w-8 rounded-full bg-gray-800">
+      <div class="truncate text-sm font-medium leading-6 text-white">{clientId}</div>
+    </div>
+  </div>
+  <div class="py-2  flex-auto">
+    <div class="flex items-center gap-x-4">
+      <div class="truncate text-sm font-medium leading-6 text-white">{clientName}</div>
+    </div>
+  </div>
+  <div class="py-2  flex-auto">
+    <div class="flex items-center justify-end gap-x-2 sm:justify-start">
+      <div class="text-white sm:block">{redactedSecret}</div>
+    </div>
+  </div>
+  <div  class="py-2 flex-auto text-white">{redirect_uri}</div>
+</div>
+</a>
